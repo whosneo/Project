@@ -81,8 +81,8 @@ if __name__ == '__main__':
 	## step 1: load data
 	print("step 1: loading data...")
 	dataSet = []
-	fileIn = open('testSet.txt')
-	# fileIn = open('788points.txt')
+	fileIn = open('./dataSet/testSet.txt')
+	# fileIn = open('./dataSet/788points.txt')
 	for line in fileIn.readlines():
 		lineArr = line.strip().split('\t')
 		# lineArr = line.strip().split(',')

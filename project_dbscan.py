@@ -74,6 +74,7 @@ def dbscan(cluster_data_set, eps, min_pts):
     return cluster_result, cluster_id - 1
 
 
+# show cluster
 def show_cluster(data, show_clusters, show_cluster_num):
     mat_clusters = mat(show_clusters).transpose()
     fig = plt.figure()

@@ -1,6 +1,6 @@
-import time
 from numpy import *
 import matplotlib.pyplot as plt
+import time
 
 
 # read data from file

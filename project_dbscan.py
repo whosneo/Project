@@ -60,10 +60,6 @@ def expand_cluster(data, cluster_result, point_id, cluster_id, eps, min_pts):
 
 
 def dbscan(cluster_data_set, eps, min_pts):
-    """
-    输入：数据集, 半径大小, 最小点个数
-    输出：分类簇id
-    """
     cluster_id = 1
     n_points = cluster_data_set.shape[1]
     cluster_result = [UNCLASSIFIED] * n_points
@@ -104,7 +100,6 @@ if __name__ == '__main__':
 
     # step 3: show the result
     print("step 3: show the result...")
-    print("cluster Numbers = ", cluster_num)
-    # print(clusters)
+    print("cluster numbers = ", cluster_num)
     show_cluster(data_set, clusters, cluster_num)
     plt.show()

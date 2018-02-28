@@ -108,4 +108,5 @@ if __name__ == '__main__':
 
     # step 3: show the result
     print("step 3: show the result...")
+    print("cluster numbers = ", k)
     show_cluster(data_set, k, centroids, assment)

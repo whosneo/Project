@@ -92,7 +92,7 @@ def show_cluster(show_data_set, show_k, show_centroids, show_cluster_assment):
 if __name__ == '__main__':
     # step 1: load data
     print("step 1: loading data...")
-    data_set = load_data('./dataSet/testSet.txt', split_char=',')
+    data_set = load_data('./dataSet/testSet.txt', split_char='\t')
     data_set = mat(data_set)  # 转换为矩阵
 
     # step 2: clustering...

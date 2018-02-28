@@ -1,120 +1,109 @@
-# -*- coding: utf-8 -*-
-__author__ = 'Wsine'
-
-import numpy as np
+from numpy import *
 import matplotlib.pyplot as plt
-import math
 import time
 
 UNCLASSIFIED = False
 NOISE = 0
 
-def loadDataSet(fileName, splitChar='\t'):
-    """
-    输入：文件名
-    输出：数据集
-    描述：从文件读入数据集
-    """
-    dataSet = []
-    with open(fileName) as fr:
-        for line in fr.readlines():
-            curline = line.strip().split(splitChar)
-            fltline = list(map(float, curline))
-            dataSet.append(fltline)
-    return dataSet
 
-def dist(a, b):
-    """
-    输入：向量A, 向量B
-    输出：两个向量的欧式距离
-    """
-    return math.sqrt(np.power(a - b, 2).sum())
+# read data from file
+def load_data(file_name, split_char='\t'):
+    load_data_set = []
+    with open(file_name) as FR:
+        for line in FR.readlines():
+            line_arr = line.strip().split(split_char)
+            load_data_set.append(list(map(float, line_arr)))
+    return load_data_set
 
-def eps_neighbor(a, b, eps):
-    """
-    输入：向量A, 向量B
-    输出：是否在eps范围内
-    """
-    return dist(a, b) < eps
 
-def region_query(data, pointId, eps):
-    """
-    输入：数据集, 查询点id, 半径大小
-    输出：在eps范围内的点的id
-    """
-    nPoints = data.shape[1]
+# calculate Euclidean distance 计算欧式距离
+def euclidean_distance(vector1, vector2):
+    return sqrt(sum(power(vector2 - vector1, 2)))
+
+
+# get points whose distance to selected point smaller than eps
+def region_query(data, point_id, eps):
+    n_points = data.shape[1]
     seeds = []
-    for i in range(nPoints):
-        if eps_neighbor(data[:, pointId], data[:, i], eps):
+    for i in range(n_points):
+        if euclidean_distance(data[:, point_id], data[:, i]) < eps:
             seeds.append(i)
     return seeds
 
-def expand_cluster(data, clusterResult, pointId, clusterId, eps, minPts):
+
+def expand_cluster(data, cluster_result, point_id, cluster_id, eps, min_pts):
     """
     输入：数据集, 分类结果, 待分类点id, 簇id, 半径大小, 最小点个数
     输出：能否成功分类
     """
-    seeds = region_query(data, pointId, eps)
-    if len(seeds) < minPts: # 不满足minPts条件的为噪声点
-        clusterResult[pointId] = NOISE
+    seeds = region_query(data, point_id, eps)
+    if len(seeds) < min_pts:  # 不满足minPts条件的为噪声点
+        cluster_result[point_id] = NOISE
         return False
     else:
-        clusterResult[pointId] = clusterId # 划分到该簇
-        for seedId in seeds:
-            clusterResult[seedId] = clusterId
+        cluster_result[point_id] = cluster_id  # 划分到该簇
+        for seed_id in seeds:
+            cluster_result[seed_id] = cluster_id
 
-        while len(seeds) > 0: # 持续扩张
-            currentPoint = seeds[0]
-            queryResults = region_query(data, currentPoint, eps)
-            if len(queryResults) >= minPts:
-                for i in range(len(queryResults)):
-                    resultPoint = queryResults[i]
-                    if clusterResult[resultPoint] == UNCLASSIFIED:
-                        seeds.append(resultPoint)
-                        clusterResult[resultPoint] = clusterId
-                    elif clusterResult[resultPoint] == NOISE:
-                        clusterResult[resultPoint] = clusterId
+        while len(seeds) > 0:  # 持续扩张
+            current_point = seeds[0]
+            query_results = region_query(data, current_point, eps)
+            if len(query_results) >= min_pts:
+                for result_point in query_results:
+                    if cluster_result[result_point] == UNCLASSIFIED:
+                        seeds.append(result_point)
+                        cluster_result[result_point] = cluster_id
+                    elif cluster_result[result_point] == NOISE:
+                        cluster_result[result_point] = cluster_id
             seeds = seeds[1:]
         return True
 
-def dbscan(data, eps, minPts):
+
+def dbscan(cluster_data_set, eps, min_pts):
     """
     输入：数据集, 半径大小, 最小点个数
     输出：分类簇id
     """
-    clusterId = 1
-    nPoints = data.shape[1]
-    clusterResult = [UNCLASSIFIED] * nPoints
-    for pointId in range(nPoints):
-        point = data[:, pointId]
-        if clusterResult[pointId] == UNCLASSIFIED:
-            if expand_cluster(data, clusterResult, pointId, clusterId, eps, minPts):
-                clusterId = clusterId + 1
-    return clusterResult, clusterId - 1
+    cluster_id = 1
+    n_points = cluster_data_set.shape[1]
+    cluster_result = [UNCLASSIFIED] * n_points
+    for point_id in range(n_points):
+        if cluster_result[point_id] == UNCLASSIFIED:
+            if expand_cluster(cluster_data_set, cluster_result, point_id, cluster_id, eps, min_pts):
+                cluster_id = cluster_id + 1
+    return cluster_result, cluster_id - 1
 
-def plotFeature(data, clusters, clusterNum):
-    nPoints = data.shape[1]
-    matClusters = np.mat(clusters).transpose()
+
+def show_cluster(data, show_clusters, show_cluster_num):
+    mat_clusters = mat(show_clusters).transpose()
     fig = plt.figure()
-    scatterColors = ['black', 'blue', 'green', 'yellow', 'red', 'purple', 'orange', 'brown']
+    scatter_colors = ['black', 'blue', 'green', 'yellow', 'red', 'purple', 'orange', 'brown']
     ax = fig.add_subplot(111)
-    for i in range(clusterNum + 1):
-        colorSytle = scatterColors[i % len(scatterColors)]
-        subCluster = data[:, np.nonzero(matClusters[:, 0].A == i)]
-        ax.scatter(subCluster[0, :].flatten().A[0], subCluster[1, :].flatten().A[0], c=colorSytle, s=50)
+    for i in range(show_cluster_num + 1):
+        color_sytle = scatter_colors[i % len(scatter_colors)]
+        sub_cluster = data[:, nonzero(mat_clusters[:, 0].A == i)]
+        ax.scatter(sub_cluster[0, :].flatten().A[0], sub_cluster[1, :].flatten().A[0], c=color_sytle, s=50)
 
-def main():
-    dataSet = loadDataSet('./dataSet/788points.txt', splitChar=',')
-    dataSet = np.mat(dataSet).transpose()
-    # print(dataSet)
-    clusters, clusterNum = dbscan(dataSet, 2, 15)
-    print("cluster Numbers = ", clusterNum)
-    # print(clusters)
-    plotFeature(dataSet, clusters, clusterNum)
 
 if __name__ == '__main__':
+    # step 1: load data
+    print("step 1: loading data...")
+    data_set = load_data('./dataSet/788points.txt', split_char=',')
+    data_set = mat(data_set).transpose()
+    # print(dataSet)
+
+    # step 2: clustering...
+    print("step 2: clustering...")
+
     start = time.clock()
-    main()
+    clusters, cluster_num = dbscan(data_set, 2, 15)
     end = time.clock()
+
     print('finish all in %s' % str(end - start))
+
+    # step 3: show the result
+    print("step 3: show the result...")
+    print("cluster Numbers = ", cluster_num)
+    # print(clusters)
+    show_cluster(data_set, clusters, cluster_num)
     plt.show()

@@ -80,6 +80,7 @@ def show_cluster(data, show_clusters, show_cluster_num):
         color_sytle = scatter_colors[i % len(scatter_colors)]
         sub_cluster = data[:, nonzero(mat_clusters[:, 0].A == i)]
         ax.scatter(sub_cluster[0, :].flatten().A[0], sub_cluster[1, :].flatten().A[0], c=color_sytle, s=50)
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -102,4 +103,3 @@ if __name__ == '__main__':
     print("step 3: show the result...")
     print("cluster numbers = ", cluster_num)
     show_cluster(data_set, clusters, cluster_num)
-    plt.show()

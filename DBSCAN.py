@@ -1,15 +1,15 @@
 import argparse
 import time
-from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from geopy.distance import great_circle
 from sklearn.cluster import DBSCAN
 
+from PROJECT import *
 
-def show(data, db):
+
+def show(data, db, eps, min_pts):
     labels = db.labels_  # labels_ 表示各个点所属的簇的编号，-1表示该点为噪音点
     # Number of clusters in labels, ignoring noise if present.
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
@@ -27,27 +27,18 @@ def show(data, db):
         class_member_mask = (labels == k)
 
         xy = data[class_member_mask]
-        plt.plot(xy[:, 1], xy[:, 0], 'o', markerfacecolor=tuple(col), markeredgecolor='k', markersize=6)
+        plt.plot(xy[:, 1], xy[:, 0], 'o', markerfacecolor=tuple(col), markeredgecolor=tuple(col), markersize=4)
 
     plt.xlim(116.28, 116.33)
     plt.ylim(39.98, 40.02)
-    plt.title('Estimated number of clusters: %d' % n_clusters_)
+    plt.title('Estimated number of clusters: %d eps: %.1f minPts: %d' % (n_clusters_, eps, min_pts))
     plt.show()
-
-
-def parse_dates(x):
-    return datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
-
-
-def geo_distance(point1, point2):
-    distance = great_circle(point1, point2).meters
-    return distance
 
 
 def main():
     parser = argparse.ArgumentParser(description='DBSCAN in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
-    parser.add_argument('-s', '--eps', help='Radius Threshold', required=False, type=float, default=200)
+    parser.add_argument('-s', '--eps', help='Radius Threshold', required=False, type=float, default=100)
     parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=60)
     args = parser.parse_args()
 
@@ -62,7 +53,7 @@ def main():
     db = DBSCAN(eps=eps, min_samples=min_pts, metric=geo_distance).fit(df)
     print("Finish all in {} seconds".format(time.time() - start))
 
-    show(df.values, db)
+    show(df.values, db, eps, min_pts)
 
 
 if __name__ == '__main__':

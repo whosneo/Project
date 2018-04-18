@@ -17,6 +17,7 @@ def show(data, db):
     # Black removed and is used for noise instead.
     unique_labels = set(labels)
     colors = [plt.cm.Spectral(each) for each in np.linspace(0, 1, len(unique_labels))]
+    plt.figure(figsize=(8, 6))
     for k, col in zip(unique_labels, colors):
         if k == -1:
             # continue
@@ -26,8 +27,10 @@ def show(data, db):
         class_member_mask = (labels == k)
 
         xy = data[class_member_mask]
-        plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col), markeredgecolor='k', markersize=6)
+        plt.plot(xy[:, 1], xy[:, 0], 'o', markerfacecolor=tuple(col), markeredgecolor='k', markersize=6)
 
+    plt.xlim(116.28, 116.33)
+    plt.ylim(39.98, 40.02)
     plt.title('Estimated number of clusters: %d' % n_clusters_)
     plt.show()
 

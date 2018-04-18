@@ -5,6 +5,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from geopy.distance import great_circle
 from sklearn.cluster import DBSCAN
 
 
@@ -35,11 +36,16 @@ def parse_dates(x):
     return datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
 
+def geo_distance(point1, point2):
+    distance = great_circle(point1, point2).meters
+    return distance
+
+
 def main():
     parser = argparse.ArgumentParser(description='DBSCAN in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
-    parser.add_argument('-s', '--eps', help='Radius Threshold', required=False, type=float, default=0.002855)
-    parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=10)
+    parser.add_argument('-s', '--eps', help='Radius Threshold', required=False, type=float, default=200)
+    parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=60)
     args = parser.parse_args()
 
     filename = args.filename
@@ -50,7 +56,7 @@ def main():
     df = df.drop('date_time', 1)
 
     start = time.time()
-    db = DBSCAN(eps=eps, min_samples=min_pts).fit(df)
+    db = DBSCAN(eps=eps, min_samples=min_pts, metric=geo_distance).fit(df)
     print("Finish all in {} seconds".format(time.time() - start))
 
     show(df.values, db)

@@ -29,9 +29,9 @@ def show(data, db, eps, min_pts):
         xy = data[class_member_mask]
         plt.plot(xy[:, 1], xy[:, 0], 'o', markerfacecolor=tuple(col), markeredgecolor=tuple(col), markersize=4)
 
-    plt.xlim(116.28, 116.33)
-    plt.ylim(39.98, 40.02)
-    plt.title('Estimated number of clusters: %d eps: %.1f minPts: %d' % (n_clusters_, eps, min_pts))
+    # plt.xlim(116.28, 116.33)
+    # plt.ylim(39.98, 40.02)
+    plt.title('[DBSCAN] Estimated number of clusters: %d eps: %.1f minPts: %d' % (n_clusters_, eps, min_pts))
     plt.show()
 
 
@@ -39,7 +39,7 @@ def main():
     parser = argparse.ArgumentParser(description='DBSCAN in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
     parser.add_argument('-s', '--eps', help='Radius Threshold', required=False, type=float, default=100)
-    parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=60)
+    parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=200)
     args = parser.parse_args()
 
     filename = args.filename

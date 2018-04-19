@@ -12,11 +12,11 @@ from PROJECT import *
 
 def show(data, k_means, k):
     colors = [plt.cm.Spectral(each) for each in np.linspace(0, 1, k)]
-    plt.figure(figsize=(8, 6))
 
     k_means_cluster_centers = np.sort(k_means.cluster_centers_, axis=0)
     k_means_labels = pairwise_distances_argmin(data, k_means_cluster_centers)
 
+    plt.figure(figsize=(8, 6))
     for n, col in zip(range(k), colors):
         class_member_mask = (k_means_labels == n)
         center = k_means_cluster_centers[n]
@@ -24,9 +24,9 @@ def show(data, k_means, k):
         plt.plot(xy[:, 1], xy[:, 0], 'o', markerfacecolor=tuple(col), markeredgecolor=tuple(col), markersize=4)
         plt.plot(center[1], center[0], 'o', markerfacecolor=tuple(col), markeredgecolor='k', markersize=14)
 
-    plt.xlim(116.28, 116.33)
-    plt.ylim(39.98, 40.02)
-    plt.title('Estimated number of clusters: %d' % k)
+    # plt.xlim(116.28, 116.33)
+    # plt.ylim(39.98, 40.02)
+    plt.title('[KMEANS] Estimated number of clusters: %d' % k)
     plt.show()
 
 

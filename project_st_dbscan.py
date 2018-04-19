@@ -6,19 +6,9 @@ import time
 from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from geopy.distance import great_circle
-from numpy import *
-
-"""
-    The minimal command to run this algorithm is:
-    $ python main.py -f sample.csv
-    Or could be executed with advanced configurations:
-    $ python main.py -f sample.csv -p 5 -s 500 -t 60
-    In the current moment, the data set must have the
-    'latitude', 'longitude' and 'date_time' columns, but
-    if you want, can be easily changed.
-"""
 
 
 def st_dbscan(df, spatial_threshold, temporal_threshold, min_neighbors):
@@ -44,8 +34,7 @@ def st_dbscan(df, spatial_threshold, temporal_threshold, min_neighbors):
     # for each point in database
     for index, point in df.iterrows():
         if df.loc[index]['cluster'] == unmarked:
-            neighborhood = retrieve_neighbors(index, df, spatial_threshold,
-                                              temporal_threshold)
+            neighborhood = retrieve_neighbors(index, df, spatial_threshold, temporal_threshold)
 
             if len(neighborhood) < min_neighbors:
                 df.at[index, 'cluster'] = noise
@@ -106,17 +95,26 @@ def parse_dates(x):
 
 
 # show cluster
-def show_cluster(data):
-    data = mat(data)
+def show_cluster(data, spatial, temporal, min_pts):
+    data = np.mat(data)
     n = data.shape[0]
-    fig = plt.figure()
-    scatter_colors = ['black', 'blue', 'green', 'yellow', 'red', 'purple', 'orange', 'brown']
-    ax = fig.add_subplot(111)
+    plt.figure(figsize=(8, 6))
+    data_labels = data[:, 3]
+    unique_labels = set(data_labels.A1)
+    colors = [plt.cm.Spectral(each) for each in np.linspace(0, 1, len(unique_labels))]
     for i in range(n):
-        if data[i, 4] < 0:
-            continue
-        color_style = scatter_colors[data[i, 4] % len(scatter_colors)]
-        ax.scatter(data[i, 2], data[i, 1], c=color_style, s=50)
+        col = colors[data[i, 3]]
+        if data[i, 3] < 0:
+            # continue
+            col = [0, 0, 0, 1]
+        plt.plot(data[i, 1], data[i, 0], 'o', markerfacecolor=tuple(col), markeredgecolor=tuple(col), markersize=4)
+
+    # plt.xlim(116.28, 116.33)
+    # plt.ylim(39.98, 40.02)
+    plt.xlim(116.2924, 116.33125)
+    plt.ylim(39.9475, 40.02)
+    plt.title('[ST-DBSCAN] Estimated number of clusters: %d spatial: %.1f temporal: %.1f minPts: %d' % (
+        len(unique_labels) - 1, spatial, temporal, min_pts))
     plt.show()
 
 
@@ -124,9 +122,9 @@ def main():
     start = time.time()
     parser = argparse.ArgumentParser(description='ST-DBSCAN in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
-    parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=60)
+    parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=100)
     parser.add_argument('-s', '--spatial', help='Spatial Threshold (in meters)', required=False, type=float,
-                        default=200)
+                        default=100)
     parser.add_argument('-t', '--temporal', help='Temporal Threshold (in seconds)', required=False, type=float,
                         default=900)
     args = parser.parse_args()
@@ -136,14 +134,14 @@ def main():
     spatial_threshold = args.spatial
     temporal_threshold = args.temporal
 
-    df = pd.read_csv(filename, sep=",", converters={'date_time': parse_dates})
+    df = pd.read_csv(filename, converters={'date_time': parse_dates})
 
     result = st_dbscan(df, spatial_threshold, temporal_threshold, min_pts)
     print("Time Elapsed: {} seconds".format(time.time() - start))
 
     time_str = time.strftime("%Y%m%d-%H%M%S")
 
-    show_cluster(result)
+    show_cluster(result, spatial_threshold, temporal_threshold, min_pts)
     output_name = "result_{}_{}_{}_{}.csv".format(spatial_threshold, temporal_threshold, min_pts, time_str)
     result.to_csv(output_name, index=False, sep=',')
 
@@ -159,4 +157,6 @@ def test_time(filename):
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    result = pd.read_csv("./result_100_900_60_20180419-121417.csv", converters={'date_time': parse_dates})
+    show_cluster(result, 100, 900, 60)

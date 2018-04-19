@@ -1,25 +1,25 @@
-import os
-import matplotlib.pyplot as plt
 from numpy import *
+import matplotlib.pyplot as plt
 
 
 def convert(file_name, write_file_name, split_char=','):
     file = open(file_name)
-    write_file = open(write_file_name, mode="w")
-    write_file.write("ID_RECORD,latitude,longitude,date_time\n")
-    # for i in range(6):
-    #     file.readline()
-    i = 0
+    write_file = open(write_file_name, mode="a")
+    write_file.write("latitude,longitude,date_time\n")
+    write_map_file = open("./dataSet/data_converted_map.csv", mode="a")
+    for i in range(6):
+        file.readline()
     while True:
         line = file.readline()
         if not line:
             break
         line_arr = line.strip().split(split_char)
-        i = i + 1
-        write_file.write(str(i) + "," + line_arr[0] + "," + line_arr[1] + "," + line_arr[5] + " " + line_arr[6] + "\n")
-        # write_file.write("{lat:" + line_arr[1] + ", lng:" + line_arr[2] + "},\n")
+        write_file.write(line_arr[0] + "," + line_arr[1] + "," + line_arr[5] + " " + line_arr[6] + "\n")
+        # write_file.write(line_arr[0] + "," + line_arr[1] + "\n")
+        write_map_file.write("{lat:" + line_arr[0] + ", lng:" + line_arr[1] + "},\n")
     file.close()
     write_file.close()
+    write_map_file.close()
 
 
 def get_every_file(dir_path, suffix='.plt'):
@@ -46,24 +46,27 @@ def main(dir_path):
         # break
 
 
-# show cluster
-def show_cluster(data):
-    data = mat(data)
-    n = data.shape[0]
-    fig = plt.figure()
-    scatter_colors = ['black', 'blue', 'green', 'yellow', 'red', 'purple', 'orange', 'brown']
-    ax = fig.add_subplot(111)
-    for i in range(n):
-        if data[i, 4] < 0:
-            continue
-        color_style = scatter_colors[data[i, 4] % len(scatter_colors)]
-        ax.scatter(data[i, 2], data[i, 1], c=color_style, s=50)
-    plt.show()
-
-
 if __name__ == "__main__":
-    path = r'/home/question/Trajectory'
-    main(path)
+    # path = r'/home/question/Trajectory'
+    # main(path)
     # convert("/home/question/save.plt", "/home/question/result.txt")
     # "/home/question/converted/20090702022530.plt"
-    # show_cluster()
+    # convert("./dataSet/20081028003826.plt", "./dataSet/data_converted.csv")
+
+    convert("./dataSet/20081111001704.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081112023003.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081112091400.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081113034608.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081114015255.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081114101436.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081115010133.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081116085532.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081117051133.plt", "./dataSet/data_converted.csv")
+    convert("./dataSet/20081117155223.plt", "./dataSet/data_converted.csv")
+
+    # plt.figure(figsize=(8, 6))
+    # x = [1, 2, 3]
+    # plt.plot(x, x, 'o')
+    # plt.ylim(0, 4)
+    # plt.title('Estimated number of clusters')
+    # plt.show()

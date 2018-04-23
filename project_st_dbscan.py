@@ -146,16 +146,6 @@ def main():
     result.to_csv(output_name, index=False, sep=',')
 
 
-def test_time(filename):
-    df = pd.read_csv(filename, sep=",", converters={'date_time': parse_dates})
-    result_t600 = st_dbscan(df, spatial_threshold=500, temporal_threshold=600, min_neighbors=5)
-
-    df = pd.read_csv(filename, sep=",", converters={'date_time': parse_dates})
-    result_t6 = st_dbscan(df, spatial_threshold=500, temporal_threshold=0.6, min_neighbors=5)
-
-    assert not result_t600.equals(result_t6)
-
-
 if __name__ == "__main__":
     # main()
     result = pd.read_csv("./result_100_900_60_20180419-121417.csv", converters={'date_time': parse_dates})

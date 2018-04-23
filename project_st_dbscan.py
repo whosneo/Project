@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from geopy.distance import great_circle
 
+from PROJECT import *
 
 
 def ST_DBSCAN(df, spatial_threshold, temporal_threshold, min_neighbors):
@@ -78,10 +78,6 @@ def retrieve_neighbors(index_center, df, spatial_threshold, temporal_threshold):
                 neighborhood.append(index)
 
     return neighborhood
-
-
-def parse_dates(x):
-    return datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
 
 # show cluster

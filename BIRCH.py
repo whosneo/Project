@@ -29,7 +29,7 @@ def show(data, birch_model, threshold):
 
     # plt.xlim(116.28, 116.33)
     # plt.ylim(39.98, 40.02)
-    plt.title('[BIRCH] (with global clustering) Number of clusters: %d Threshold: %.3f' % (n_clusters, threshold))
+    plt.title('[BIRCH] Estimated number of clusters: %d Threshold: %.3f' % (n_clusters, threshold))
     plt.show()
 
 
@@ -47,7 +47,7 @@ def main():
 
     start = time.time()
     birch_model = Birch(threshold=threshold, n_clusters=None).fit(df)  # Birch(threshold=1.7, n_clusters=100)
-    print("Birch with global clustering as the final step took %0.2f seconds" % (time.time() - start))
+    print("[BIRCH] Finish all in {} seconds".format(time.time() - start))
 
     show(df.values, birch_model, threshold)
 

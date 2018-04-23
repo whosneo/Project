@@ -11,18 +11,8 @@ import pandas as pd
 from geopy.distance import great_circle
 
 
-def st_dbscan(df, spatial_threshold, temporal_threshold, min_neighbors):
-    """
-    Python st-dbscan implementation.
-    INPUTS:
-        df={o1,o2,...,on} Set of objects
-        spatial_threshold = Maximum geographical coordinate (spatial) distance
-        value
-        temporal_threshold = Maximum non-spatial distance value
-        min_neighbors = Minimum number of points within Eps1 and Eps2 distance
-    OUTPUT:
-        C = {c1,c2,...,ck} Set of clusters
-    """
+
+def ST_DBSCAN(df, spatial_threshold, temporal_threshold, min_neighbors):
     cluster_label = 0
     noise = -1
     unmarked = 777777
@@ -95,7 +85,7 @@ def parse_dates(x):
 
 
 # show cluster
-def show_cluster(data, spatial, temporal, min_pts):
+def show(data, spatial, temporal, min_pts):
     data = np.mat(data)
     n = data.shape[0]
     plt.figure(figsize=(8, 6))
@@ -119,7 +109,6 @@ def show_cluster(data, spatial, temporal, min_pts):
 
 
 def main():
-    start = time.time()
     parser = argparse.ArgumentParser(description='ST-DBSCAN in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
     parser.add_argument('-p', '--minPts', help='Minimum number of points', required=False, type=int, default=100)
@@ -136,17 +125,18 @@ def main():
 
     df = pd.read_csv(filename, converters={'date_time': parse_dates})
 
-    result = st_dbscan(df, spatial_threshold, temporal_threshold, min_pts)
-    print("Time Elapsed: {} seconds".format(time.time() - start))
+    start = time.time()
+    st_db = ST_DBSCAN(df, spatial_threshold, temporal_threshold, min_pts)
+    print("[ST-DBSCAN] Finish all in {} seconds".format(time.time() - start))
+
+    show(st_db, spatial_threshold, temporal_threshold, min_pts)
 
     time_str = time.strftime("%Y%m%d-%H%M%S")
-
-    show_cluster(result, spatial_threshold, temporal_threshold, min_pts)
-    output_name = "result_{}_{}_{}_{}.csv".format(spatial_threshold, temporal_threshold, min_pts, time_str)
-    result.to_csv(output_name, index=False, sep=',')
+    output_name = "st_dbscan_result_{}_{}_{}_{}.csv".format(spatial_threshold, temporal_threshold, min_pts, time_str)
+    st_db.to_csv(output_name, index=False, sep=',')
 
 
 if __name__ == "__main__":
-    # main()
-    result = pd.read_csv("./result_100_900_60_20180419-121417.csv", converters={'date_time': parse_dates})
-    show_cluster(result, 100, 900, 60)
+    main()
+    # result = pd.read_csv("./result_100_900_60_20180419-121417.csv", converters={'date_time': parse_dates})
+    # show(result, 100, 900, 60)

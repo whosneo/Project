@@ -44,7 +44,7 @@ def main():
 
     start = time.time()
     k_means = KMeans(init='random', n_clusters=k, n_init=10).fit(df)  # init='k-means++'
-    print("Finish all in {} seconds".format(time.time() - start))
+    print("[KMEANS] Finish all in {} seconds".format(time.time() - start))
 
     show(df.values, k_means, k)
 

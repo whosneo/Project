@@ -51,7 +51,7 @@ def main():
 
     start = time.time()
     db = DBSCAN(eps=eps, min_samples=min_pts, metric=geo_distance).fit(df)
-    print("Finish all in {} seconds".format(time.time() - start))
+    print("[DBSCAN] Finish all in {} seconds".format(time.time() - start))
 
     show(df.values, db, eps, min_pts)
 

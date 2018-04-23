@@ -22,6 +22,22 @@ def convert(file_name, write_file_name, split_char=','):
     write_map_file.close()
 
 
+def csv_convert_map(file_name, write_file_name, split_char=','):
+    file = open(file_name)
+    write_file = open(write_file_name, mode="a")
+    file.readline()
+    while True:
+        line = file.readline()
+        if not line:
+            break
+        line_arr = line.strip().split(split_char)
+        if int(line_arr[3]) < 0:
+            continue
+        write_file.write("{lat:" + line_arr[0] + ", lng:" + line_arr[1] + "},\n")
+    file.close()
+    write_file.close()
+
+
 def get_every_file(dir_path, suffix='.plt'):
     new_file_list = []
     file_list = os.listdir(dir_path)
@@ -53,17 +69,18 @@ if __name__ == "__main__":
     # "/home/question/converted/20090702022530.plt"
     # convert("./dataSet/20081028003826.plt", "./dataSet/data_converted.csv")
 
-    convert("./dataSet/20081111001704.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081112023003.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081112091400.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081113034608.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081114015255.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081114101436.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081115010133.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081116085532.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081117051133.plt", "./dataSet/data_converted.csv")
-    convert("./dataSet/20081117155223.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081111001704.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081112023003.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081112091400.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081113034608.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081114015255.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081114101436.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081115010133.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081116085532.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081117051133.plt", "./dataSet/data_converted.csv")
+    # convert("./dataSet/20081117155223.plt", "./dataSet/data_converted.csv")
 
+    csv_convert_map("./result_100_900_60_20180419-121417.csv", "./map.csv")
     # plt.figure(figsize=(8, 6))
     # x = [1, 2, 3]
     # plt.plot(x, x, 'o')

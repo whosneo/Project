@@ -3,7 +3,7 @@
 
 import argparse
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,72 +12,61 @@ import pandas as pd
 from PROJECT import *
 
 
-def ST_DBSCAN(df, spatial_threshold, temporal_threshold, min_neighbors):
-    cluster_label = 0
+def ST_DBSCAN(df, spatial_threshold, temporal_threshold, min_pts):
+    labels_ = 0
     noise = -1
-    unmarked = 777777
+    unmarked = -2
     stack = []
 
-    # initialize each point with unmarked
     df['cluster'] = unmarked
 
-    # for each point in database
     for index, point in df.iterrows():
         if df.loc[index]['cluster'] == unmarked:
-            neighborhood = retrieve_neighbors(index, df, spatial_threshold, temporal_threshold)
+            neighbors = find_neighbors(index, df, spatial_threshold, temporal_threshold)
 
-            if len(neighborhood) < min_neighbors:
+            if len(neighbors) < min_pts:
                 df.at[index, 'cluster'] = noise
-            else:  # found a core point
-                cluster_label += 1
-                # assign a label to core point
-                df.at[index, 'cluster'] = cluster_label
+            else:
+                labels_ += 1
+                df.at[index, 'cluster'] = labels_
 
-                # assign core's label to its neighborhood
-                for neig_index in neighborhood:
-                    df.at[neig_index, 'cluster'] = cluster_label
-                    stack.append(neig_index)  # append neighborhood to stack
+                for neighbor in neighbors:
+                    df.at[neighbor, 'cluster'] = labels_
+                    stack.append(neighbor)
 
-                # find new neighbors from core point neighborhood
                 while len(stack) > 0:
                     current_point_index = stack.pop()
-                    new_neighborhood = retrieve_neighbors(
-                        current_point_index, df, spatial_threshold,
-                        temporal_threshold)
+                    new_neighbors = find_neighbors(current_point_index, df, spatial_threshold, temporal_threshold)
 
-                    # current_point is a new core
-                    if len(new_neighborhood) >= min_neighbors:
-                        for neig_index in new_neighborhood:
-                            neig_cluster = df.loc[neig_index]['cluster']
-                            if all([neig_cluster != noise,
-                                    neig_cluster == unmarked]):
-                                # TODO: verify cluster average
-                                # before add new point
-                                df.at[neig_index, 'cluster'] = cluster_label
-                                stack.append(neig_index)
+                    if len(new_neighbors) >= min_pts:
+                        for new_neighbor in new_neighbors:
+                            neighbor_cluster = df.loc[new_neighbor]['cluster']
+                            if neighbor_cluster == unmarked:
+                                df.at[new_neighbor, 'cluster'] = labels_
+                                stack.append(new_neighbor)
+                            elif neighbor_cluster == noise:
+                                df.at[new_neighbor, 'cluster'] = labels_
     return df
 
 
-def retrieve_neighbors(index_center, df, spatial_threshold, temporal_threshold):
-    neighborhood = []
+# find neighbors by two thresholds
+def find_neighbors(index_center, df, spatial_threshold, temporal_threshold):
+    neighbors = []
 
     center_point = df.loc[index_center]
 
-    # filter by time
     min_time = center_point['date_time'] - timedelta(seconds=temporal_threshold)
     max_time = center_point['date_time'] + timedelta(seconds=temporal_threshold)
     df = df[(df['date_time'] >= min_time) & (df['date_time'] <= max_time)]
 
-    # filter by distance
     for index, point in df.iterrows():
         if index != index_center:
-            distance = great_circle(
-                (center_point['latitude'], center_point['longitude']),
-                (point['latitude'], point['longitude'])).meters
+            distance = geo_distance((center_point['latitude'], center_point['longitude']),
+                                    (point['latitude'], point['longitude']))
             if distance <= spatial_threshold:
-                neighborhood.append(index)
+                neighbors.append(index)
 
-    return neighborhood
+    return neighbors
 
 
 # show cluster
@@ -129,7 +118,7 @@ def main():
 
     time_str = time.strftime("%Y%m%d-%H%M%S")
     output_name = "st_dbscan_result_{}_{}_{}_{}.csv".format(spatial_threshold, temporal_threshold, min_pts, time_str)
-    st_db.to_csv(output_name, index=False, sep=',')
+    st_db.to_csv(output_name, index=False)
 
 
 if __name__ == "__main__":

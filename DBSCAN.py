@@ -55,6 +55,10 @@ def main():
 
     show(df.values, db, eps, min_pts)
 
+    time_str = time.strftime("%Y%m%d-%H%M%S")
+    output_name = "dbscan_result_{}_{}_{}.csv".format(eps, min_pts, time_str)
+    df.to_csv(output_name, index=False)
+
 
 if __name__ == '__main__':
     main()

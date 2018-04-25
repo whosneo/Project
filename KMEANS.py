@@ -39,7 +39,7 @@ def main():
     filename = args.filename
     k = args.k
 
-    df = pd.read_csv(filename, sep=",", converters={'date_time': parse_dates})
+    df = pd.read_csv(filename, converters={'date_time': parse_dates})
     df = df.drop('date_time', 1)
 
     start = time.time()

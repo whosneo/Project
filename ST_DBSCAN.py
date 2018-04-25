@@ -71,25 +71,26 @@ def find_neighbors(index_center, df, spatial_threshold, temporal_threshold):
 
 # show cluster
 def show(data, spatial, temporal, min_pts):
-    data = np.mat(data)
-    n = data.shape[0]
     plt.figure(figsize=(8, 6))
-    data_labels = data[:, 3]
-    unique_labels = set(data_labels.A1)
+    labels = data['cluster']
+    data = np.mat(data)
+    unique_labels = set(labels)
+    n_clusters_ = len(unique_labels) - (1 if -1 in labels else 0)
     colors = [plt.cm.Spectral(each) for each in np.linspace(0, 1, len(unique_labels))]
-    for i in range(n):
-        col = colors[data[i, 3]]
-        if data[i, 3] < 0:
+    for k, col in zip(unique_labels, colors):
+        if k == -1:
             # continue
             col = [0, 0, 0, 1]
-        plt.plot(data[i, 1], data[i, 0], 'o', markerfacecolor=tuple(col), markeredgecolor=tuple(col), markersize=4)
+        class_member_mask = (labels == k)
+        xy = data[class_member_mask]
+        plt.plot(xy[:, 1], xy[:, 0], 'o', markerfacecolor=tuple(col), markeredgecolor=tuple(col), markersize=4)
 
     # plt.xlim(116.28, 116.33)
     # plt.ylim(39.98, 40.02)
     plt.xlim(116.2924, 116.33125)
     plt.ylim(39.9475, 40.02)
     plt.title('[ST-DBSCAN] Estimated number of clusters: %d spatial: %.1f temporal: %.1f minPts: %d' % (
-        len(unique_labels) - 1, spatial, temporal, min_pts))
+        n_clusters_, spatial, temporal, min_pts))
     plt.show()
 
 
@@ -114,7 +115,7 @@ def main():
     st_db = ST_DBSCAN(df, spatial_threshold, temporal_threshold, min_pts)
     print("[ST-DBSCAN] Finish all in {} seconds".format(time.time() - start))
 
-    show(st_db, spatial_threshold, temporal_threshold, min_pts)
+    show(st_db.values, spatial_threshold, temporal_threshold, min_pts)
 
     time_str = time.strftime("%Y%m%d-%H%M%S")
     output_name = "st_dbscan_result_{}_{}_{}_{}.csv".format(spatial_threshold, temporal_threshold, min_pts, time_str)
@@ -123,5 +124,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # result = pd.read_csv("./result_100_900_60_20180419-121417.csv", converters={'date_time': parse_dates})
-    # show(result, 100, 900, 60)
+    # result = pd.read_csv("./st_dbscan_result_100_900_100_20180425-161956.csv", converters={'date_time': parse_dates})
+    # show(result, 100, 900, 100)

@@ -43,7 +43,7 @@ def main():
     df = df.drop('date_time', 1)
 
     start = time.time()
-    k_means = KMeans(init='random', n_clusters=k, n_init=10).fit(df)  # init='k-means++'
+    k_means = KMeans(init='random', n_clusters=k).fit(df)  # init='k-means++'
     print("[KMEANS] Finish all in {} seconds".format(time.time() - start))
 
     show(df.values, k_means, k)

@@ -34,7 +34,7 @@ def show(data, birch_model, threshold):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='DBSCAN in Python')
+    parser = argparse.ArgumentParser(description='BIRCH in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
     parser.add_argument('-t', '--threshold', help='Threshold', required=False, type=float, default=0.004)
     args = parser.parse_args()

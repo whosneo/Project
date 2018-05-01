@@ -19,7 +19,7 @@ def show(data):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='DBSCAN in Python')
+    parser = argparse.ArgumentParser(description='Show original data')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
     args = parser.parse_args()
 

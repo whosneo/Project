@@ -31,7 +31,7 @@ def show(data, k_means, k):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='DBSCAN in Python')
+    parser = argparse.ArgumentParser(description='K-Means in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
     parser.add_argument('-k', '--k', help='The number of clusters', required=True, type=int)
     args = parser.parse_args()

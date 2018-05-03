@@ -3,9 +3,9 @@
 These files are from my final year project, which were designed to implement several clustering algorithms.
 
 These algorithms are:
-* K-means
+* K-Means
+* BIRCH
 * DBSCAN
+* ST-DBSCAN
 
-Now only have two algorithms, but in next several months I will add more.
-
-Thank @Wsine for DBSCAN code, @zouxy for K-means code.
+``K-Means``, ``BIRCH`` and ``DBSCAN`` was implemented by ``sklearn`` module.

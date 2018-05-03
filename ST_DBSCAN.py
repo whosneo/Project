@@ -5,8 +5,6 @@ import argparse
 import time
 from datetime import timedelta
 
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 from PROJECT import *
@@ -69,31 +67,6 @@ def find_neighbors(index_center, df, spatial_threshold, temporal_threshold):
     return neighbors
 
 
-# show cluster
-def show(data, spatial, temporal, min_pts):
-    plt.figure(figsize=(8, 6))
-    labels = data['cluster']
-    data = np.mat(data)
-    unique_labels = set(labels)
-    n_clusters_ = len(unique_labels) - (1 if -1 in labels else 0)
-    colors = [plt.cm.Spectral(each) for each in np.linspace(0, 1, len(unique_labels))]
-    for k, col in zip(unique_labels, colors):
-        if k == -1:
-            # continue
-            col = [0, 0, 0, 1]
-        class_member_mask = (labels == k)
-        xy = data[class_member_mask]
-        plt.plot(xy[:, 1], xy[:, 0], 'o', markerfacecolor=tuple(col), markeredgecolor=tuple(col), markersize=4)
-
-    # plt.xlim(116.28, 116.33)
-    # plt.ylim(39.98, 40.02)
-    plt.xlim(116.2924, 116.33125)
-    plt.ylim(39.9475, 40.02)
-    plt.title('[ST-DBSCAN] Estimated number of clusters: %d spatial: %.1f temporal: %.1f minPts: %d' % (
-        n_clusters_, spatial, temporal, min_pts))
-    plt.show()
-
-
 def main():
     parser = argparse.ArgumentParser(description='ST-DBSCAN in Python')
     parser.add_argument('-f', '--filename', help='Name of the file', required=True)
@@ -115,14 +88,9 @@ def main():
     st_db = ST_DBSCAN(df, spatial_threshold, temporal_threshold, min_pts)
     print("[ST-DBSCAN] Finish all in {} seconds".format(time.time() - start))
 
-    show(st_db.values, spatial_threshold, temporal_threshold, min_pts)
-
-    time_str = time.strftime("%Y%m%d-%H%M%S")
-    output_name = "st_dbscan_result_{}_{}_{}_{}.csv".format(spatial_threshold, temporal_threshold, min_pts, time_str)
-    st_db.to_csv(output_name, index=False)
+    output_name = "/var/www/project/st_dbscan_result_{}_{}_{}.csv".format(spatial_threshold, temporal_threshold, min_pts)
+    transform_save(st_db, output_name)
 
 
 if __name__ == "__main__":
     main()
-    # result = pd.read_csv("./st_dbscan_result_100_900_100_20180425-161956.csv", converters={'date_time': parse_dates})
-    # show(result, 100, 900, 100)
